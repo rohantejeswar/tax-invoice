@@ -28,6 +28,22 @@
                 border-radius: 10px;
                 box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             }
+            @media (max-width: 900px) {
+                .container {
+                    flex-direction: column;
+                    gap: 0;
+                }
+                .form,
+                .bill {
+                    width: 100%;
+                    margin-bottom: 20px;
+                    box-sizing: border-box;
+                }
+                .print-tip {
+                    max-width: unset !important;
+                    margin-left: 0 !important;
+                }
+            }
             .bill table {
                 width: 100%;
                 border-collapse: collapse;
@@ -96,6 +112,16 @@
             .text-right {
                 text-align: right !important;
             }
+            .print-tip {
+                background: #fffbe7;
+                border: 1px solid #ffe082;
+                border-radius: 8px;
+                padding: 18px;
+                max-width: 600px;
+                margin-left: auto;
+                margin-bottom: 40px;
+                font-size: 0.9rem;
+            }
             @media print {
                 body {
                     background: #fff;
@@ -117,7 +143,28 @@
         </style>
     </head>
     <body>
-        <h2>Restaurant Bill Generator</h2>
+        <div class="container">
+            <h2>Restaurant Bill Generator</h2>
+
+            <div class="print-tip">
+                <strong>Printing Tip:</strong>
+                <ul style="margin-top: 8px">
+                    <li>
+                        <b>To get the best print output:</b>
+                        <ul>
+                            <li>Open your browser's print dialog (Ctrl+P or Cmd+P).</li>
+                            <li>Go to <b>More settings</b>.</li>
+                            <li><b>Disable</b> the <b>Headers and footers</b> option.</li>
+                            <li><b>Enable</b> the <b>Background graphics</b> (or <b>Print backgrounds</b>) option.</li>
+                        </ul>
+                    </li>
+                </ul>
+                <div style="font-size: 0.95em; color: #a67c00; margin-top: 8px">
+                    These options ensure your bill prints without extra page numbers/URLs and with all colors and backgrounds.
+                </div>
+            </div>
+        </div>
+
         <div class="container">
             <!-- Input Form -->
             <div class="form">
@@ -220,7 +267,7 @@
                             <th>Description</th>
                         </tr>
                         <tr>
-                            <td id="outWords" style="text-transform: capitalize;">-</td>
+                            <td id="outWords" style="text-transform: capitalize">-</td>
                             <td>Monthly meal</td>
                         </tr>
                     </table>
