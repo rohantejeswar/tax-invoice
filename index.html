@@ -225,7 +225,7 @@
                         <tr>
                             <td id="outCustomer">-</td>
                             <td class="text-right">
-                                Invoice No.: <span id="outInvoice">001</span><br />
+                                Invoice No.: <span id="outInvoice">-</span><br />
                                 Date: <span id="outDate">-</span>
                             </td>
                         </tr>
@@ -285,69 +285,36 @@
         <script>
             function numberToWords(num) {
                 if (num === 0) return "zero";
+                const ones = ["","one","two","three","four","five","six","seven","eight","nine",
+                              "ten","eleven","twelve","thirteen","fourteen","fifteen","sixteen",
+                              "seventeen","eighteen","nineteen"];
+                const tens = ["","","twenty","thirty","forty","fifty","sixty","seventy","eighty","ninety"];
 
-                const ones = [
-                    "",
-                    "one",
-                    "two",
-                    "three",
-                    "four",
-                    "five",
-                    "six",
-                    "seven",
-                    "eight",
-                    "nine",
-                    "ten",
-                    "eleven",
-                    "twelve",
-                    "thirteen",
-                    "fourteen",
-                    "fifteen",
-                    "sixteen",
-                    "seventeen",
-                    "eighteen",
-                    "nineteen"
-                ];
-                const tens = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"];
-
-                // Helper to convert 1–99
                 function twoDigit(n) {
                     if (n < 20) return ones[n];
-                    let t = Math.floor(n / 10);
-                    let o = n % 10;
+                    let t = Math.floor(n / 10), o = n % 10;
                     return tens[t] + (o ? " " + ones[o] : "");
                 }
-
-                // Helper to convert 1–999
                 function threeDigit(n) {
-                    let h = Math.floor(n / 100);
-                    let rest = n % 100;
-                    let result = "";
+                    let h = Math.floor(n / 100), rest = n % 100, result = "";
                     if (h > 0) result += ones[h] + " hundred";
                     if (rest > 0) result += (result ? " " : "") + twoDigit(rest);
                     return result;
                 }
 
                 let result = "";
-
-                const crore = Math.floor(num / 10000000);
-                num %= 10000000;
+                const crore = Math.floor(num / 10000000); num %= 10000000;
                 if (crore) result += threeDigit(crore) + " crore ";
-
-                const lakh = Math.floor(num / 100000);
-                num %= 100000;
+                const lakh = Math.floor(num / 100000); num %= 100000;
                 if (lakh) result += threeDigit(lakh) + " lakh ";
-
-                const thousand = Math.floor(num / 1000);
-                num %= 1000;
+                const thousand = Math.floor(num / 1000); num %= 1000;
                 if (thousand) result += threeDigit(thousand) + " thousand ";
-
                 const hundred = num;
                 if (hundred) result += threeDigit(hundred);
-
                 return result.trim();
             }
 
+            // Update bill preview
             function updateBill() {
                 document.getElementById("outRestaurant").innerText = document.getElementById("restaurantName").value;
                 document.getElementById("outPhone").innerText = document.getElementById("phoneNumber").value;
@@ -365,13 +332,33 @@
                 el.addEventListener("input", updateBill);
             });
 
-            function printBill() {
-                window.print();
-                generateInvoiceId();
+            // Generate a unique bill number: MMM-XXXX + random digit
+            function generateUniqueBillNo() {
+            const now = new Date();
+
+            // First 3 letters of month
+            const monthNames = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+            const month = monthNames[now.getMonth()];
+
+            // Timestamp = minutes + seconds (4 digits)
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const timestamp = (minutes + seconds);
+
+            // Add 1 random digit to avoid clash
+            // const randomDigit = Math.floor(Math.random() * 10);
+
+            return `${month}-${timestamp}`;
             }
 
             function generateInvoiceId() {
-                document.getElementById("outInvoice").innerText = Math.floor(1000 + Math.random() * 9000);
+                const invoiceId = generateUniqueBillNo();
+                document.getElementById("outInvoice").innerText = invoiceId;
+            }
+
+            function printBill() {
+                window.print();
+                generateInvoiceId(); // prepare new ID for next bill
             }
 
             window.onload = function () {
