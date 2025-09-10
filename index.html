@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Restaurant Bill Generator</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background: #f5f5f5;
+                color: #222222;
+                padding: 20px;
+            }
+            .container {
+                display: flex;
+                gap: 20px;
+            }
+            .form {
+                width: 35%;
+                background: #fff;
+                padding: 15px;
+                border-radius: 10px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            }
+            .bill {
+                width: 60%;
+                background: #fff;
+                padding: 20px;
+                border-radius: 10px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            }
+            .bill table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            .bill th,
+            .bill td {
+                border: 1px solid #aaa;
+                padding: 8px;
+                text-align: left;
+            }
+            .bill th {
+                background: #dcd6f7;
+            }
+            .center {
+                text-align: center;
+            }
+            .sign {
+                margin-top: 40px;
+                text-align: right;
+                display: flex;
+                flex-direction: column;
+            }
+            .sign img {
+                width: 140px;
+                margin: 1rem 0 1rem auto;
+            }
+            button {
+                margin-top: 15px;
+                padding: 10px 15px;
+                border: none;
+                background: #4caf50;
+                color: #fff;
+                border-radius: 5px;
+                cursor: pointer;
+            }
+            button:hover {
+                background: #45a049;
+            }
+            .form-group {
+                margin-bottom: 18px;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .form-group label {
+                margin-bottom: 6px;
+                font-weight: 500;
+                color: #333;
+                font-size: 0.85rem;
+            }
+
+            .input {
+                padding: 10px 12px;
+                border: 1.5px solid #bdbdbd;
+                border-radius: 6px;
+                font-size: 1rem;
+                transition: border-color 0.2s;
+                background: #fafaff;
+                font-size: 0.85rem;
+            }
+            .input:focus {
+                border-color: #7c5dfa;
+                outline: none;
+                background: #fff;
+            }
+            .text-right {
+                text-align: right !important;
+            }
+            @media print {
+                body {
+                    background: #fff;
+                }
+                body * {
+                    visibility: hidden;
+                }
+                #section-to-print,
+                #section-to-print * {
+                    visibility: visible;
+                }
+                #section-to-print {
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                    width: 100vw;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <h2>Restaurant Bill Generator</h2>
+        <div class="container">
+            <!-- Input Form -->
+            <div class="form">
+                <h3>Bill Parameters</h3>
+
+                <!-- Prefilled Params -->
+                <div class="form-group">
+                    <label for="restaurantName">Restaurant Name:</label>
+                    <input type="text" id="restaurantName" value="Sri Krishna Ghar" class="input" />
+                </div>
+
+                <div class="form-group">
+                    <label for="phoneNumber">Phone Number:</label>
+                    <input type="text" id="phoneNumber" value="9148977030" class="input" />
+                </div>
+
+                <div class="form-group">
+                    <label for="signature">Signature:</label>
+                    <input type="text" id="signature" value="Sri Krishna Ghar" class="input" />
+                </div>
+
+                <!-- User Input Params -->
+                <div class="form-group">
+                    <label for="customerName">Customer Name:</label>
+                    <input type="text" id="customerName" class="input" />
+                </div>
+
+                <div class="form-group">
+                    <label for="billDate">Date:</label>
+                    <input type="date" id="billDate" class="input" />
+                </div>
+
+                <div class="form-group">
+                    <label for="amount">Amount (₹):</label>
+                    <input type="number" id="amount" class="input" />
+                </div>
+
+                <button onclick="printBill()">Print as PDF</button>
+                <button onclick="generateInvoiceId()">Regenerate ID</button>
+            </div>
+
+            <!-- Bill Preview -->
+            <div class="bill" id="billOutput">
+                <section id="section-to-print">
+                    <h3 class="center">Tax Invoice</h3>
+                    <h2 class="center" id="outRestaurant">Sri Krishna Ghar</h2>
+                    <p class="center">Phone no.: <span id="outPhone">9148977030</span></p>
+
+                    <table>
+                        <colgroup>
+                            <col style="width: 30%" />
+                            <col style="width: 70%" />
+                        </colgroup>
+                        <tr>
+                            <th>Bill To</th>
+                            <th class="text-right">Invoice Details</th>
+                        </tr>
+                        <tr>
+                            <td id="outCustomer">-</td>
+                            <td class="text-right">
+                                Invoice No.: <span id="outInvoice">001</span><br />
+                                Date: <span id="outDate">-</span>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <div style="display: flex">
+                        <div style="flex: 1; border: 1px solid #aaaaaa"></div>
+                        <table style="flex: 1">
+                            <colgroup>
+                                <col style="width: 50%" />
+                                <col style="width: 50%" />
+                            </colgroup>
+                            <tr>
+                                <th>Amounts</th>
+                                <th></th>
+                            </tr>
+                            <tr>
+                                <td>Total</td>
+                                <td class="text-right">₹ <span id="outAmount">0.00</span></td>
+                            </tr>
+                            <tr>
+                                <td>Received</td>
+                                <td class="text-right">₹ <span id="outAmountReceived">0.00</span></td>
+                            </tr>
+                            <tr>
+                                <td>Balance</td>
+                                <td class="text-right">₹ 0.00</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <table>
+                        <colgroup>
+                            <col style="width: 70%" />
+                            <col style="width: 30%" />
+                        </colgroup>
+                        <tr>
+                            <th>Invoice Amount In Words</th>
+                            <th>Description</th>
+                        </tr>
+                        <tr>
+                            <td id="outWords" style="text-transform: capitalize;">-</td>
+                            <td>Monthly meal</td>
+                        </tr>
+                    </table>
+
+                    <p>Thank you for doing business with us.</p>
+                    <div class="sign">
+                        <span id="outSignature">For: Sri Krishna Ghar</span>
+                        <img src="assets/sig.png" alt="" />
+                        Authorized Signatory
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <script>
+            function numberToWords(num) {
+                if (num === 0) return "zero";
+
+                const ones = [
+                    "",
+                    "one",
+                    "two",
+                    "three",
+                    "four",
+                    "five",
+                    "six",
+                    "seven",
+                    "eight",
+                    "nine",
+                    "ten",
+                    "eleven",
+                    "twelve",
+                    "thirteen",
+                    "fourteen",
+                    "fifteen",
+                    "sixteen",
+                    "seventeen",
+                    "eighteen",
+                    "nineteen"
+                ];
+                const tens = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"];
+
+                // Helper to convert 1–99
+                function twoDigit(n) {
+                    if (n < 20) return ones[n];
+                    let t = Math.floor(n / 10);
+                    let o = n % 10;
+                    return tens[t] + (o ? " " + ones[o] : "");
+                }
+
+                // Helper to convert 1–999
+                function threeDigit(n) {
+                    let h = Math.floor(n / 100);
+                    let rest = n % 100;
+                    let result = "";
+                    if (h > 0) result += ones[h] + " hundred";
+                    if (rest > 0) result += (result ? " " : "") + twoDigit(rest);
+                    return result;
+                }
+
+                let result = "";
+
+                const crore = Math.floor(num / 10000000);
+                num %= 10000000;
+                if (crore) result += threeDigit(crore) + " crore ";
+
+                const lakh = Math.floor(num / 100000);
+                num %= 100000;
+                if (lakh) result += threeDigit(lakh) + " lakh ";
+
+                const thousand = Math.floor(num / 1000);
+                num %= 1000;
+                if (thousand) result += threeDigit(thousand) + " thousand ";
+
+                const hundred = num;
+                if (hundred) result += threeDigit(hundred);
+
+                return result.trim();
+            }
+
+            function updateBill() {
+                document.getElementById("outRestaurant").innerText = document.getElementById("restaurantName").value;
+                document.getElementById("outPhone").innerText = document.getElementById("phoneNumber").value;
+                document.getElementById("outSignature").innerText = document.getElementById("signature").value;
+                document.getElementById("outCustomer").innerText = document.getElementById("customerName").value;
+                document.getElementById("outDate").innerText = document.getElementById("billDate").value;
+
+                const amount = document.getElementById("amount").value;
+                document.getElementById("outAmount").innerText = amount;
+                document.getElementById("outAmountReceived").innerText = amount;
+                document.getElementById("outWords").innerText = numberToWords(amount) + " Rupees Only";
+            }
+
+            document.querySelectorAll("input").forEach((el) => {
+                el.addEventListener("input", updateBill);
+            });
+
+            function printBill() {
+                window.print();
+            }
+
+            function generateInvoiceId() {
+                document.getElementById("outInvoice").innerText = Math.floor(1000 + Math.random() * 9000);
+            }
+
+            window.onload = function () {
+                generateInvoiceId();
+            };
+        </script>
+    </body>
+</html>
