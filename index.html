@@ -186,10 +186,14 @@
                     <input type="text" id="signature" value="Sri Krishna Ghar" class="input" />
                 </div>
 
-                <!-- User Input Params -->
                 <div class="form-group">
                     <label for="customerName">Customer Name:</label>
                     <input type="text" id="customerName" class="input" />
+                </div>
+
+                <div class="form-group">
+                    <label for="billNo">Bill Number:</label>
+                    <input type="text" id="billNo" class="input" />
                 </div>
 
                 <div class="form-group">
@@ -321,6 +325,7 @@
                 document.getElementById("outSignature").innerText = document.getElementById("signature").value;
                 document.getElementById("outCustomer").innerText = document.getElementById("customerName").value;
                 document.getElementById("outDate").innerText = document.getElementById("billDate").value;
+                document.getElementById("outInvoice").innerText = document.getElementById("billNo").value;
 
                 const amount = document.getElementById("amount").value;
                 document.getElementById("outAmount").innerText = amount;
@@ -359,6 +364,7 @@
             function printBill() {
                 window.print();
                 generateInvoiceId(); // prepare new ID for next bill
+
             }
 
             window.onload = function () {
